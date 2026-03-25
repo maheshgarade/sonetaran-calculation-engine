@@ -18,7 +18,8 @@ import {
   getDurationString,
 } from "./utils/CountDaysUtil";
 import {
-  calculateInterest,
+  calculateMonthlyInterest,
+  calculateTotalAmount,
   interestBreakdown,
 } from "./utils/InterestCalculatorUtil";
 import { calculateMaxLoanTenure2 } from "./utils/MaxLoanTenureUtil";
@@ -316,7 +317,7 @@ export class CalculationEngine {
     );
   }
 
-  static calculateInterest(
+  static calculateTotalAmount(
     principal: number,
     annualRate: number,
     totalMonths: number,
@@ -324,7 +325,25 @@ export class CalculationEngine {
     interestType: string,
     compoundFrequency: string,
   ) {
-    return calculateInterest(
+    return calculateTotalAmount(
+      principal,
+      annualRate,
+      totalMonths,
+      totalDays,
+      interestType,
+      compoundFrequency,
+    );
+  }
+
+  static calculateMonthlyInterest(
+    principal: number,
+    annualRate: number,
+    totalMonths: number,
+    totalDays: number,
+    interestType: string,
+    compoundFrequency: string,
+  ) {
+    return calculateMonthlyInterest(
       principal,
       annualRate,
       totalMonths,
@@ -360,7 +379,7 @@ export class CalculationEngine {
       );
 
     const total =
-      CalculationEngine.calculateInterest(
+      CalculationEngine.calculateTotalAmount(
         kalam.customerPrincipal,
         customerAnnualInterestRate,
         roundedLoanDuration.totalMonths,
@@ -384,6 +403,18 @@ export class CalculationEngine {
       0,
     );
 
+    const monthlyInterestList = CalculationEngine.calculateMonthlyInterest(
+      kalam.customerPrincipal,
+      customerAnnualInterestRate,
+      roundedLoanDuration.totalMonths,
+      roundedLoanDuration.days,
+      kalam.interest?.type,
+      kalam.interest?.compoundFrequency || "ANNUALLY",
+    );
+
+    const monthlyInterest =
+      monthlyInterestList[monthlyInterestList?.length - 1]?.interest;
+
     profitLossSnapshot.fundingDue.customer = {
       breakdown,
       interest,
@@ -393,7 +424,7 @@ export class CalculationEngine {
     };
 
     fundingSlices.forEach((slice) => {
-      const { funderType, fundingPrincipal } = slice;
+      const { funderType } = slice;
 
       if (funderType?.toUpperCase() === "VYAPARI") {
         const vyapariAnnualInterestRate = slice.interest?.rate * 12 || 0;
@@ -406,8 +437,8 @@ export class CalculationEngine {
           );
 
         const total =
-          CalculationEngine.calculateInterest(
-            fundingPrincipal,
+          CalculationEngine.calculateTotalAmount(
+            slice.fundingPrincipal,
             vyapariAnnualInterestRate,
             roundedLoanDuration.totalMonths,
             roundedLoanDuration.days,
@@ -417,7 +448,7 @@ export class CalculationEngine {
 
         const breakdown =
           CalculationEngine.interestBreakdown(
-            fundingPrincipal,
+            slice.fundingPrincipal,
             vyapariAnnualInterestRate,
             roundedLoanDuration.totalMonths,
             roundedLoanDuration.days,
@@ -430,10 +461,21 @@ export class CalculationEngine {
           0,
         );
 
+        const monthlyInterestList = CalculationEngine.calculateMonthlyInterest(
+          slice.fundingPrincipal,
+          vyapariAnnualInterestRate,
+          15,
+          roundedLoanDuration.days,
+          slice.interest?.type,
+          slice.interest?.compoundFrequency || "ANNUALLY",
+        );
+        const monthlyInterest =
+          monthlyInterestList[monthlyInterestList?.length - 1]?.interest;
+
         profitLossSnapshot.fundingDue.vyapari = {
           breakdown,
           interest,
-          principal: fundingPrincipal,
+          principal: slice.fundingPrincipal,
           total,
           roundedLoanDuration,
         };
@@ -455,8 +497,8 @@ export class CalculationEngine {
           );
 
         const total =
-          CalculationEngine.calculateInterest(
-            fundingPrincipal,
+          CalculationEngine.calculateTotalAmount(
+            slice.fundingPrincipal,
             dukandarAnnualInterestRate,
             roundedLoanDuration.totalMonths,
             roundedLoanDuration.days,
@@ -466,7 +508,7 @@ export class CalculationEngine {
 
         const breakdown =
           CalculationEngine.interestBreakdown(
-            fundingPrincipal,
+            slice.fundingPrincipal,
             dukandarAnnualInterestRate,
             roundedLoanDuration.totalMonths,
             roundedLoanDuration.days,
@@ -479,10 +521,22 @@ export class CalculationEngine {
           0,
         );
 
+        const monthlyInterestList = CalculationEngine.calculateMonthlyInterest(
+          slice.fundingPrincipal,
+          dukandarAnnualInterestRate,
+          15,
+          roundedLoanDuration.days,
+          slice.interest?.type,
+          slice.interest?.compoundFrequency || "ANNUALLY",
+        );
+
+        const monthlyInterest =
+          monthlyInterestList[monthlyInterestList?.length - 1]?.interest;
+
         profitLossSnapshot.fundingDue.dukandar = {
           breakdown,
           interest,
-          principal: fundingPrincipal,
+          principal: slice.fundingPrincipal,
           total,
           roundedLoanDuration,
         };

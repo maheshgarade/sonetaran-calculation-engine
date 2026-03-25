@@ -1,4 +1,10 @@
-export const calculateInterest = (
+export interface MonthlyBreakdown {
+  month: number; // 1-indexed
+  interest: number;
+}
+
+// What you hand to the user — the final maturity value
+export const calculateTotalAmount = (
   principal: number,
   annualRate: number,
   totalMonths: number,
@@ -94,6 +100,138 @@ export const calculateSimpleInterest = (
   }
 
   return Math.round(amount + totalInterest);
+};
+
+// Interest only, no principal
+export const calculateTotalInterest = (
+  principal: number,
+  annualRate: number,
+  totalMonths: number,
+  totalDays: number,
+  interestType: string,
+  compoundFrequency: string,
+): number => {
+  const breakdown = calculateMonthlyInterest(
+    principal,
+    annualRate,
+    totalMonths,
+    totalDays,
+    interestType,
+    compoundFrequency,
+  );
+  return breakdown.reduce((sum, entry) => sum + entry.interest, 0);
+};
+
+// Routing + per-month interest breakdown
+export const calculateMonthlyInterest = (
+  principal: number,
+  annualRate: number,
+  totalMonths: number,
+  totalDays: number,
+  interestType: string,
+  compoundFrequency: string,
+): MonthlyBreakdown[] => {
+  if (interestType.toUpperCase() === "SIMPLE") {
+    return calculateSimpleInterestMonthly(
+      principal,
+      annualRate,
+      totalMonths,
+      totalDays,
+    );
+  }
+
+  if (interestType.toUpperCase() === "COMPOUND") {
+    if (compoundFrequency.toUpperCase() === "ANNUALLY") {
+      return calculateAnnualCompoundInterestMonthly(
+        principal,
+        annualRate,
+        totalMonths,
+        totalDays,
+      );
+    }
+    // Future: "MONTHLY", "QUARTERLY", etc.
+  }
+
+  return [];
+};
+
+export const calculateSimpleInterestMonthly = (
+  principal: number,
+  annualRate: number,
+  totalMonths: number,
+  totalDays: number,
+): MonthlyBreakdown[] => {
+  const rate = annualRate / 100;
+  const monthlyInterest = principal * (rate / 12); // Constant every month
+  const result: MonthlyBreakdown[] = [];
+
+  for (let m = 1; m <= totalMonths; m++) {
+    result.push({ month: m, interest: Math.round(monthlyInterest) });
+  }
+
+  // Fold remaining days into the last month (or create month 1 if no full months)
+  if (totalDays > 0) {
+    const daysInterest = principal * (rate / 365) * totalDays;
+    if (result.length > 0) {
+      result[result.length - 1].interest += Math.round(daysInterest);
+    } else {
+      result.push({ month: 1, interest: Math.round(daysInterest) });
+    }
+  }
+
+  return result;
+};
+
+export const calculateAnnualCompoundInterestMonthly = (
+  principal: number,
+  annualRate: number,
+  totalMonths: number,
+  totalDays: number,
+): MonthlyBreakdown[] => {
+  const rate = annualRate / 100;
+  const fullYears = Math.floor(totalMonths / 12);
+  const remainingMonths = totalMonths % 12;
+  const result: MonthlyBreakdown[] = [];
+
+  let currentPrincipal = principal;
+  let monthCounter = 1;
+
+  // Full years: within each year, monthly interest is uniform (same base),
+  // then the principal compounds at year-end before the next year starts
+  for (let y = 0; y < fullYears; y++) {
+    const monthlyInterest = currentPrincipal * (rate / 12);
+    for (let m = 0; m < 12; m++) {
+      result.push({
+        month: monthCounter++,
+        interest: Math.round(monthlyInterest),
+      });
+    }
+    currentPrincipal *= 1 + rate; // Compound at year boundary
+  }
+
+  // Remaining months: simple interest on the now-compounded principal
+  if (remainingMonths > 0) {
+    const monthlyInterest = currentPrincipal * (rate / 12);
+    for (let m = 0; m < remainingMonths; m++) {
+      result.push({
+        month: monthCounter++,
+        interest: Math.round(monthlyInterest),
+      });
+    }
+    currentPrincipal += currentPrincipal * (rate / 12) * remainingMonths;
+  }
+
+  // Fold remaining days into the last month
+  if (totalDays > 0) {
+    const daysInterest = currentPrincipal * (rate / 365) * totalDays;
+    if (result.length > 0) {
+      result[result.length - 1].interest += Math.round(daysInterest);
+    } else {
+      result.push({ month: 1, interest: Math.round(daysInterest) });
+    }
+  }
+
+  return result;
 };
 
 export const interestBreakdown = (
