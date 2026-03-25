@@ -1,7 +1,4 @@
-export interface MonthlyBreakdown {
-  month: number; // 1-indexed
-  interest: number;
-}
+import { InterestUnit, type PeriodicInterest } from "./interest.types";
 
 // What you hand to the user — the final maturity value
 export const calculateTotalAmount = (
@@ -102,26 +99,6 @@ export const calculateSimpleInterest = (
   return Math.round(amount + totalInterest);
 };
 
-// Interest only, no principal
-export const calculateTotalInterest = (
-  principal: number,
-  annualRate: number,
-  totalMonths: number,
-  totalDays: number,
-  interestType: string,
-  compoundFrequency: string,
-): number => {
-  const breakdown = calculateMonthlyInterest(
-    principal,
-    annualRate,
-    totalMonths,
-    totalDays,
-    interestType,
-    compoundFrequency,
-  );
-  return breakdown.reduce((sum, entry) => sum + entry.interest, 0);
-};
-
 // Routing + per-month interest breakdown
 export const calculateMonthlyInterest = (
   principal: number,
@@ -130,7 +107,7 @@ export const calculateMonthlyInterest = (
   totalDays: number,
   interestType: string,
   compoundFrequency: string,
-): MonthlyBreakdown[] => {
+): PeriodicInterest[] => {
   if (interestType.toUpperCase() === "SIMPLE") {
     return calculateSimpleInterestMonthly(
       principal,
@@ -160,10 +137,10 @@ export const calculateSimpleInterestMonthly = (
   annualRate: number,
   totalMonths: number,
   totalDays: number,
-): MonthlyBreakdown[] => {
+): PeriodicInterest[] => {
   const rate = annualRate / 100;
   const monthlyInterest = principal * (rate / 12); // Constant every month
-  const result: MonthlyBreakdown[] = [];
+  const result: PeriodicInterest[] = [];
 
   for (let m = 1; m <= totalMonths; m++) {
     result.push({ month: m, interest: Math.round(monthlyInterest) });
@@ -187,11 +164,11 @@ export const calculateAnnualCompoundInterestMonthly = (
   annualRate: number,
   totalMonths: number,
   totalDays: number,
-): MonthlyBreakdown[] => {
+): PeriodicInterest[] => {
   const rate = annualRate / 100;
   const fullYears = Math.floor(totalMonths / 12);
   const remainingMonths = totalMonths % 12;
-  const result: MonthlyBreakdown[] = [];
+  const result: PeriodicInterest[] = [];
 
   let currentPrincipal = principal;
   let monthCounter = 1;
@@ -282,7 +259,7 @@ export const annualCompoundInterestBreakdown = (
 
     breakdown.push({
       duration: i,
-      unit: "year",
+      unit: InterestUnit.YEAR,
       principal: Math.round(amount),
       interest: Math.round(interest),
       total: Math.round(total),
@@ -301,7 +278,7 @@ export const annualCompoundInterestBreakdown = (
 
     breakdown.push({
       duration: months,
-      unit: "month",
+      unit: InterestUnit.MONTH,
       principal: Math.round(amount),
       interest: Math.round(interestForMonths),
       total: Math.round(total),
@@ -320,7 +297,7 @@ export const annualCompoundInterestBreakdown = (
 
     breakdown.push({
       duration: totalDays,
-      unit: "days",
+      unit: InterestUnit.DAYS,
       principal: Math.round(amount),
       interest: Math.round(interestForDays),
       total: Math.round(total),
@@ -355,7 +332,7 @@ export const simpleInterestBreakdown = (
 
     breakdown.push({
       duration: i,
-      unit: "year",
+      unit: InterestUnit.YEAR,
       principal: Math.round(principal),
       principleAndInterest: Math.round(principal + totalInterest),
       interest: Math.round(interest),
@@ -375,7 +352,7 @@ export const simpleInterestBreakdown = (
 
     breakdown.push({
       duration: months,
-      unit: "month",
+      unit: InterestUnit.MONTH,
       principal: Math.round(principal),
       principleAndInterest: Math.round(principal + totalInterest),
       interest: Math.round(interestForMonths),
@@ -395,7 +372,7 @@ export const simpleInterestBreakdown = (
 
     breakdown.push({
       duration: totalDays,
-      unit: "days",
+      unit: InterestUnit.DAYS,
       principal: Math.round(principal),
       principleAndInterest: Math.round(principal + totalInterest),
       interest: Math.round(interestForDays),

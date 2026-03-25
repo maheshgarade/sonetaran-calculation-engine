@@ -105,7 +105,7 @@ export const getDurationString = (startDate: Date, endDate: Date): string => {
     months += 12;
   }
 
-  let parts = [];
+  const parts = [];
   if (years > 0) parts.push(`${years}Y`);
   if (months > 0) parts.push(`${months}M`);
   if (days > 0 || (years === 0 && months === 0 && days === 0))

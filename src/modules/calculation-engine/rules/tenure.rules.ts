@@ -1,4 +1,4 @@
-import { calculateAnnualCompoundInterest } from "./InterestCalculatorUtil";
+import { calculateAnnualCompoundInterest } from "../core/interest/interest.calculator";
 
 //This method depend on calculateAnnualCompoundInterest to calculate max loan tenure
 export const calculateMaxLoanTenure = (

@@ -1,12 +1,12 @@
 import { useEffect } from "react";
-import { CalculationEngine } from "./modules/calculation-engine/calculation.engine";
 import "./App.css";
 import { mockData } from "./mockData";
+import type { FundingData } from "./modules/calculation-engine/kalam-snapshot.model";
+import { CalculationEngine } from "./modules/calculation-engine/orchestrators/calculation.engine";
 import type {
   FundingSlice,
   Kalam,
-} from "./modules/calculation-engine/calculation.engine.types";
-import type { FundingData } from "./modules/calculation-engine/kalam-snapshot.model";
+} from "./modules/calculation-engine/domain/kalam/kalam.types";
 function App() {
   useEffect(() => {
     // Example: take the first Kalam entry
@@ -20,7 +20,7 @@ function App() {
         fundingSlices as FundingSlice[],
         kalam as Kalam,
       );
-    // console.log("📊 Profit/Loss Snapshot:", profitLossSnapshot);
+    console.log("📊 Profit/Loss Snapshot:", profitLossSnapshot);
   }, []);
 
   return <div></div>;

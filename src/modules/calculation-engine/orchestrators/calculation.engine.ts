@@ -5,24 +5,26 @@
  * Handles financial calculations, risk assessment, and value estimations.
  */
 
-import type { FundingData, PartnerMetrics } from "./kalam-snapshot.model";
-import type {
-  DurationMode,
-  DurationResult,
-  FundingSlice,
-  Kalam,
-  SliceStatus,
-} from "./calculation.engine.types";
 import {
   calculateRoundedMonthsAndDays,
   getDurationString,
-} from "./utils/CountDaysUtil";
+  type DurationResult,
+} from "../core/duration/duration.calculator";
 import {
   calculateMonthlyInterest,
   calculateTotalAmount,
   interestBreakdown,
-} from "./utils/InterestCalculatorUtil";
-import { calculateMaxLoanTenure2 } from "./utils/MaxLoanTenureUtil";
+} from "../core/interest/interest.calculator";
+import type {
+  FundingSlice,
+  Kalam,
+  SliceStatus,
+} from "../domain/kalam/kalam.types";
+import type { FundingData, PartnerMetrics } from "../kalam-snapshot.model";
+import { calculateMaxLoanTenure2 } from "../rules/tenure.rules";
+import { FunderType } from "../enums/funder-type.enum";
+import type { DurationMode } from "../enums/duration-mode.enum";
+import type { InterestBreakdown } from "../core/interest/interest.types";
 
 export class CalculationEngine {
   /**
@@ -183,7 +185,7 @@ export class CalculationEngine {
   static calculateRoundedMonthsAndDays(
     startDate: Date | null,
     endDate: Date | null,
-    mode: DurationMode = "MONTHLY",
+    mode: DurationMode,
     count: number = 0,
   ): DurationResult {
     return calculateRoundedMonthsAndDays(startDate, endDate, mode, count);
@@ -267,22 +269,24 @@ export class CalculationEngine {
         "active"
       ) {
         let sliceDuration: { totalMonths: number; days: number };
-        if (slice.funderType?.toLocaleUpperCase() === "VYAPARI") {
+        if (slice.funderType?.toLocaleUpperCase() === FunderType.VYAPARI) {
           sliceDuration = CalculationEngine.calculateRoundedMonthsAndDays(
             CalculationEngine.toDate(slice.startDate),
             now,
             slice.terms?.duration?.toUpperCase() as DurationMode,
             slice.terms?.graceDays || 0,
           );
-          duration["VYAPARI"] = sliceDuration;
-        } else if (slice.funderType?.toLocaleUpperCase() === "DUKANDAR") {
+          duration[FunderType.VYAPARI] = sliceDuration;
+        } else if (
+          slice.funderType?.toLocaleUpperCase() === FunderType.DUKANDAR
+        ) {
           sliceDuration = CalculationEngine.calculateRoundedMonthsAndDays(
             CalculationEngine.toDate(slice.startDate),
             now,
             slice.terms?.duration?.toUpperCase() as DurationMode,
             slice.terms?.graceDays || 0,
           );
-          duration["DUKANDAR"] = sliceDuration;
+          duration[FunderType.DUKANDAR] = sliceDuration;
         } else {
           return {
             VYAPARI: { totalMonths: 0, days: 0 },
@@ -389,7 +393,7 @@ export class CalculationEngine {
         kalam.interest?.compoundFrequency || "ANNUALLY",
       ) || 0;
 
-    const breakdown =
+    const breakdown: InterestBreakdown[] =
       CalculationEngine.interestBreakdown(
         kalam.customerPrincipal,
         customerAnnualInterestRate,
@@ -398,9 +402,9 @@ export class CalculationEngine {
         kalam.interest?.type,
         kalam.interest?.compoundFrequency || "ANNUALLY",
       ) || [];
-
+    console.log("breakdown", breakdown);
     const totalInterest = breakdown.reduce(
-      (acc, curr) => acc + (curr.interest || 0),
+      (acc: number, curr: InterestBreakdown) => acc + (curr.interest || 0),
       0,
     );
 
