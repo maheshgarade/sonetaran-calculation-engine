@@ -18,3 +18,8 @@ funderName: '',
 interest: {rate: 1.5, type: "simple", compoundFrequency: null, extraMonths: null},
 terms: {"duration": "monthly_15", "graceDays": 1}
 }]
+
+// Calculation logic
+monthlyProfit = customer monthly interest - (vyapari monthly interest + overborrwed monthly interest);
+totalProfit = customer total interest - (vyapari total interest + overborrwed total interest);
+totalFunding = dukandar total due + overborrwed total due

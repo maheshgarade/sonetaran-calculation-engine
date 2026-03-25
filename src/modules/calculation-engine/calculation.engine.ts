@@ -364,6 +364,7 @@ export class CalculationEngine {
         customer: undefined,
         vyapari: undefined,
         dukandar: undefined,
+        overBorrowed: undefined,
       },
       totalFundingDue: 0,
       monthlyProfit: 0,
@@ -398,7 +399,7 @@ export class CalculationEngine {
         kalam.interest?.compoundFrequency || "ANNUALLY",
       ) || [];
 
-    const interest = breakdown.reduce(
+    const totalInterest = breakdown.reduce(
       (acc, curr) => acc + (curr.interest || 0),
       0,
     );
@@ -414,6 +415,7 @@ export class CalculationEngine {
 
     const monthlyInterest =
       monthlyInterestList[monthlyInterestList?.length - 1]?.interest;
+    const interest = { total: totalInterest, monthly: monthlyInterest };
 
     profitLossSnapshot.fundingDue.customer = {
       breakdown,
@@ -456,7 +458,7 @@ export class CalculationEngine {
             slice.interest?.compoundFrequency || "ANNUALLY",
           ) || [];
 
-        const interest = breakdown.reduce(
+        const totalInterest = breakdown.reduce(
           (acc, curr) => acc + (curr.interest || 0),
           0,
         );
@@ -471,6 +473,7 @@ export class CalculationEngine {
         );
         const monthlyInterest =
           monthlyInterestList[monthlyInterestList?.length - 1]?.interest;
+        const interest = { total: totalInterest, monthly: monthlyInterest };
 
         profitLossSnapshot.fundingDue.vyapari = {
           breakdown,
@@ -479,12 +482,6 @@ export class CalculationEngine {
           total,
           roundedLoanDuration,
         };
-
-        // update totals
-        profitLossSnapshot.totalFundingDue += total;
-        profitLossSnapshot.monthlyProfit += interest;
-        profitLossSnapshot.totalProfit +=
-          interest * roundedLoanDuration.totalMonths;
       } else if (funderType?.toUpperCase() === "DUKANDAR") {
         const dukandarAnnualInterestRate = slice.interest?.rate * 12 || 0;
 
@@ -516,7 +513,7 @@ export class CalculationEngine {
             slice.interest?.compoundFrequency || "ANNUALLY",
           ) || [];
 
-        const interest = breakdown.reduce(
+        const totalInterest = breakdown.reduce(
           (acc, curr) => acc + (curr.interest || 0),
           0,
         );
@@ -532,6 +529,7 @@ export class CalculationEngine {
 
         const monthlyInterest =
           monthlyInterestList[monthlyInterestList?.length - 1]?.interest;
+        const interest = { total: totalInterest, monthly: monthlyInterest };
 
         profitLossSnapshot.fundingDue.dukandar = {
           breakdown,
@@ -540,13 +538,22 @@ export class CalculationEngine {
           total,
           roundedLoanDuration,
         };
-
-        // profitLossSnapshot.totalFundingDue += total;
-        profitLossSnapshot.monthlyProfit += interest;
-        profitLossSnapshot.totalProfit +=
-          interest * roundedLoanDuration.totalMonths;
       }
     });
+    profitLossSnapshot.monthlyProfit =
+      profitLossSnapshot.fundingDue.customer.interest.monthly -
+      ((profitLossSnapshot.fundingDue.vyapari?.interest.monthly || 0) +
+        (profitLossSnapshot.fundingDue.overBorrowed?.interest.monthly || 0));
+
+    profitLossSnapshot.totalProfit =
+      profitLossSnapshot.fundingDue.customer.interest.total -
+      ((profitLossSnapshot.fundingDue.vyapari?.interest.total || 0) +
+        (profitLossSnapshot.fundingDue.overBorrowed?.interest.total || 0));
+
+    profitLossSnapshot.totalFundingDue =
+      (profitLossSnapshot.fundingDue.dukandar?.total || 0) +
+      (profitLossSnapshot.fundingDue.overBorrowed?.total || 0);
+
     console.log("*****************profitLossSnapshot", profitLossSnapshot);
     return profitLossSnapshot;
   }

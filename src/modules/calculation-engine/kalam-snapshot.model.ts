@@ -22,7 +22,7 @@ export interface FundingBreakdown {
 
 export interface FundingEntity {
   breakdown: FundingBreakdown[];
-  interest: number;
+  interest: { monthly: number; total: number };
   principal: number;
   total: number;
   roundedLoanDuration: RoundedLoanDuration;
@@ -33,6 +33,7 @@ export interface FundingData {
     customer?: FundingEntity;
     vyapari?: FundingEntity;
     dukandar?: FundingEntity;
+    overBorrowed?: FundingEntity;
   };
   totalFundingDue: number;
   monthlyProfit: number;
