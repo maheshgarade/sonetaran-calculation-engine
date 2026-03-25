@@ -8,7 +8,7 @@ export interface RoundedLoanDuration {
 export interface PartnerMetrics {
   VYAPARI: RoundedLoanDuration;
   DUKANDAR: RoundedLoanDuration;
-  CUSTOMER: RoundedLoanDuration;
+  CUSTOMER?: RoundedLoanDuration;
 }
 export interface FundingBreakdown {
   duration: number;

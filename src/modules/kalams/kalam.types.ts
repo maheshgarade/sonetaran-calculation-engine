@@ -1,8 +1,7 @@
-import { ObjectId } from "mongodb";
-import type { DurationMode } from "../../enums/duration-mode.enum";
-import type { InterestType } from "../../enums/interest-type.enum";
-import type { FunderType } from "../../enums/funder-type.enum";
-import type { DurationResult } from "../../core/duration/duration.types";
+import type { DurationResult } from "../calculation-engine/core/duration/duration.types";
+import { DurationMode } from "../calculation-engine/enums/duration-mode.enum";
+import type { FunderType } from "../calculation-engine/enums/funder-type.enum";
+import { InterestType } from "../calculation-engine/enums/interest-type.enum";
 
 export interface KalamInterest {
   rate: number;
@@ -11,28 +10,6 @@ export interface KalamInterest {
 }
 
 export type SliceStatus = "active" | "closed";
-
-export interface FundingSlice {
-  _id: string | ObjectId;
-  kalamId: string | ObjectId;
-  funderType: FunderType;
-  funderId?: string | ObjectId | null;
-
-  fundingPrincipal: number;
-
-  interest: KalamInterest;
-
-  terms: {
-    duration: DurationMode;
-    graceDays?: number | null;
-  };
-
-  startDate: Date | string;
-  endDate?: Date | string | null;
-
-  createdAt: Date | string;
-  updatedAt: Date | string;
-}
 
 export interface Kalam {
   _id: string;

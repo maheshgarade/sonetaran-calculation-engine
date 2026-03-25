@@ -15,17 +15,16 @@ import {
   calculateTotalAmount,
   interestBreakdown,
 } from "../core/interest/interest.calculator";
-import type {
-  FundingSlice,
-  Kalam,
-  PartnerMetrics,
-  SliceStatus,
-} from "../domain/kalam/kalam.types";
 import { calculateMaxLoanTenure2 } from "../rules/tenure.rules";
 import { FunderType } from "../enums/funder-type.enum";
 import type { DurationMode } from "../enums/duration-mode.enum";
 import type { InterestBreakdown } from "../core/interest/interest.types";
-import type { FundingData } from "../../kalams/kalam-snapshot.model";
+import type { FundingSlice } from "../../funding/funding.types";
+import type {
+  PartnerMetrics,
+  FundingData,
+} from "../../kalams/kalam-snapshot.model";
+import type { SliceStatus, Kalam } from "../../kalams/kalam.types";
 
 export class CalculationEngine {
   /**
