@@ -1,12 +1,13 @@
 import { useEffect } from "react";
 import "./App.css";
 import { mockData } from "./mockData";
-import type { FundingData } from "./modules/calculation-engine/kalam-snapshot.model";
 import { CalculationEngine } from "./modules/calculation-engine/orchestrators/calculation.engine";
 import type {
+  FundingData,
   FundingSlice,
-  Kalam,
-} from "./modules/calculation-engine/domain/kalam/kalam.types";
+} from "./modules/funding/funding.types";
+import type { Kalam } from "./modules/kalams/kalam.types";
+
 function App() {
   useEffect(() => {
     // Example: take the first Kalam entry
