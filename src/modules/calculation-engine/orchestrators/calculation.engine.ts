@@ -557,7 +557,6 @@ export class CalculationEngine {
       (profitLossSnapshot.fundingDue.dukandar?.total || 0) +
       (profitLossSnapshot.fundingDue.overBorrowed?.total || 0);
 
-    console.log("*****************profitLossSnapshot", profitLossSnapshot);
     return profitLossSnapshot;
   }
 }
