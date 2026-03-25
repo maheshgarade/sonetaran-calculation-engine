@@ -18,13 +18,14 @@ import {
 import type {
   FundingSlice,
   Kalam,
+  PartnerMetrics,
   SliceStatus,
 } from "../domain/kalam/kalam.types";
-import type { FundingData, PartnerMetrics } from "../kalam-snapshot.model";
 import { calculateMaxLoanTenure2 } from "../rules/tenure.rules";
 import { FunderType } from "../enums/funder-type.enum";
 import type { DurationMode } from "../enums/duration-mode.enum";
 import type { InterestBreakdown } from "../core/interest/interest.types";
+import type { FundingData } from "../../kalams/kalam-snapshot.model";
 
 export class CalculationEngine {
   /**
@@ -261,7 +262,6 @@ export class CalculationEngine {
     const duration: PartnerMetrics = {
       VYAPARI: { totalMonths: 0, days: 0 },
       DUKANDAR: { totalMonths: 0, days: 0 },
-      CUSTOMER: { totalMonths: 0, days: 0 },
     };
     fundingSlices.forEach((slice) => {
       if (

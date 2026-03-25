@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 import type { DurationMode } from "../../enums/duration-mode.enum";
 import type { InterestType } from "../../enums/interest-type.enum";
 import type { FunderType } from "../../enums/funder-type.enum";
+import type { DurationResult } from "../../core/duration/duration.types";
 
 export interface KalamInterest {
   rate: number;
@@ -69,3 +70,5 @@ export interface Kalam {
   createdAt: string | Date;
   updatedAt: string | Date;
 }
+
+export type PartnerMetrics = Record<FunderType, DurationResult>;
