@@ -6,7 +6,7 @@ import type {
   FundingData,
   FundingSlice,
 } from "./modules/funding/funding.types";
-import type { Kalam } from "./modules/kalams/kalam.types";
+import type { KalamType } from "./modules/kalams/kalam.types";
 
 function App() {
   useEffect(() => {
@@ -19,7 +19,7 @@ function App() {
     const profitLossSnapshot: FundingData =
       CalculationEngine.calculateProfitLossSnapshot(
         fundingSlices as FundingSlice[],
-        kalam as Kalam,
+        kalam as KalamType,
       );
     console.log("📊 Profit/Loss Snapshot:", profitLossSnapshot);
   }, []);

@@ -11,7 +11,7 @@ export interface KalamInterest {
 
 export type SliceStatus = "active" | "closed";
 
-export interface Kalam {
+export interface KalamType {
   _id: string;
   kalamCode: string;
 

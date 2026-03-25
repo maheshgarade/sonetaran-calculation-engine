@@ -24,7 +24,7 @@ import type {
   PartnerMetrics,
   FundingData,
 } from "../../kalams/kalam-snapshot.model";
-import type { SliceStatus, Kalam } from "../../kalams/kalam.types";
+import type { SliceStatus, KalamType } from "../../kalams/kalam.types";
 
 export class CalculationEngine {
   /**
@@ -358,7 +358,7 @@ export class CalculationEngine {
 
   static calculateProfitLossSnapshot(
     fundingSlices: FundingSlice[],
-    kalam: Kalam,
+    kalam: KalamType,
   ): FundingData {
     const now = new Date();
     const customerAnnualInterestRate = kalam.interest?.rate * 12 || 0;
