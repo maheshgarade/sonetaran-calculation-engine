@@ -19,12 +19,12 @@ import { calculateMaxLoanTenure2 } from "../rules/tenure.rules";
 import { FunderType } from "../enums/funder-type.enum";
 import type { DurationMode } from "../enums/duration-mode.enum";
 import type { InterestBreakdown } from "../core/interest/interest.types";
-import type { FundingSlice } from "../../funding/funding.types";
+import type { FundingSlice, FundingData } from "../../funding/funding.types";
 import type {
+  SliceStatus,
   PartnerMetrics,
-  FundingData,
-} from "../../kalams/kalam-snapshot.model";
-import type { SliceStatus, KalamType } from "../../kalams/kalam.types";
+  KalamType,
+} from "../../kalams/kalam.types";
 
 export class CalculationEngine {
   /**
@@ -361,7 +361,7 @@ export class CalculationEngine {
     kalam: KalamType,
   ): FundingData {
     const now = new Date();
-    const customerAnnualInterestRate = kalam.interest?.rate * 12 || 0;
+    const customerAnnualInterestRate = (kalam.interest?.rate || 0) * 12 || 0;
     const profitLossSnapshot: FundingData = {
       fundingDue: {
         customer: undefined,
@@ -388,7 +388,7 @@ export class CalculationEngine {
         customerAnnualInterestRate,
         roundedLoanDuration.totalMonths,
         roundedLoanDuration.days,
-        kalam.interest?.type,
+        kalam.interest?.type || "SIMPLE",
         kalam.interest?.compoundFrequency || "ANNUALLY",
       ) || 0;
 
@@ -398,7 +398,7 @@ export class CalculationEngine {
         customerAnnualInterestRate,
         roundedLoanDuration.totalMonths,
         roundedLoanDuration.days,
-        kalam.interest?.type,
+        kalam.interest?.type || "SIMPLE",
         kalam.interest?.compoundFrequency || "ANNUALLY",
       ) || [];
     console.log("breakdown", breakdown);
@@ -412,7 +412,7 @@ export class CalculationEngine {
       customerAnnualInterestRate,
       roundedLoanDuration.totalMonths,
       roundedLoanDuration.days,
-      kalam.interest?.type,
+      kalam.interest?.type || "SIMPLE",
       kalam.interest?.compoundFrequency || "ANNUALLY",
     );
 
@@ -557,6 +557,7 @@ export class CalculationEngine {
       (profitLossSnapshot.fundingDue.dukandar?.total || 0) +
       (profitLossSnapshot.fundingDue.overBorrowed?.total || 0);
 
+    console.log("*****************profitLossSnapshot", profitLossSnapshot);
     return profitLossSnapshot;
   }
 }

@@ -1,14 +1,14 @@
-import type { ObjectId } from "mongoose";
-import type { DurationResult } from "../calculation-engine/core/duration/duration.calculator";
+import { Types } from "mongoose";
 import { DurationMode } from "../calculation-engine/enums/duration-mode.enum";
-import type { FunderType } from "../calculation-engine/enums/funder-type.enum";
+import { FunderType } from "../calculation-engine/enums/funder-type.enum";
+import type { DurationResult } from "../calculation-engine/core/duration/duration.calculator";
 import type { KalamInterest } from "../kalams/kalam.types";
 
 export interface FundingSlice {
-  _id: string | ObjectId;
-  kalamId: string | ObjectId;
+  _id: string | Types.ObjectId;
+  kalamId: string | Types.ObjectId;
   funderType: FunderType;
-  funderId?: string | ObjectId | null;
+  funderId?: string | Types.ObjectId | null;
 
   fundingPrincipal: number;
 

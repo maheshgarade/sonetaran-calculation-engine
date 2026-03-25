@@ -1,26 +1,27 @@
-import type { DurationResult } from "../calculation-engine/core/duration/duration.types";
+import { Types } from "mongoose";
 import { DurationMode } from "../calculation-engine/enums/duration-mode.enum";
-import type { FunderType } from "../calculation-engine/enums/funder-type.enum";
 import { InterestType } from "../calculation-engine/enums/interest-type.enum";
+import type { DurationResult } from "../calculation-engine/core/duration/duration.calculator";
+import type { FunderType } from "../calculation-engine/enums/funder-type.enum";
 
 export interface KalamInterest {
   rate: number;
-  type: InterestType;
+  type: InterestType | string;
   compoundFrequency?: string | null;
 }
 
 export type SliceStatus = "active" | "closed";
 
 export interface KalamType {
-  _id: string;
+  _id: string | Types.ObjectId;
   kalamCode: string;
 
-  dukandarId: string;
-  customerId: string;
+  dukandarId: string | Types.ObjectId;
+  customerId: string | Types.ObjectId;
 
-  rootKalamId: string;
-  renewedFromKalamId: string | null;
-  renewedToKalamId: string | null;
+  rootKalamId?: string | null | Types.ObjectId;
+  renewedFromKalamId?: string | null | Types.ObjectId;
+  renewedToKalamId?: string | null | Types.ObjectId;
 
   renewalCount: number;
 
@@ -28,21 +29,21 @@ export interface KalamType {
 
   customerPrincipal: number;
 
-  interest: KalamInterest;
+  interest: KalamInterest | null;
 
   durationType: DurationMode;
 
   startDate: string | Date;
-  endDate: string | Date | null;
+  endDate?: string | Date | null;
 
   gracePeriod: number;
 
   isMigrated: boolean;
   isDraft: boolean;
 
-  expiresAt: string | Date | null;
+  expiresAt?: string | Date | null;
 
-  voidReason: string | null;
+  voidReason?: string | null;
 
   createdAt: string | Date;
   updatedAt: string | Date;
