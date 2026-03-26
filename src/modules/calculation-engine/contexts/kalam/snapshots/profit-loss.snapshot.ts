@@ -1,4 +1,3 @@
-import { KalamType } from "@/modules/kalams/kalam.types";
 import { FundingSlice } from "@/modules/funding/funding.types";
 
 import {
@@ -11,6 +10,7 @@ import { FunderType } from "@/modules/calculation-engine/enums/funder-type.enum"
 import { CalculationEngine } from "@/modules/calculation-engine/orchestrators/calculation.engine";
 import { InterestBreakdown } from "@/modules/calculation-engine/core/interest/interest.types";
 import { normalizeFunderType } from "../helpers/funder-type.helper";
+import { KalamType } from "@/modules/kalams/kalam.types";
 
 export class ProfitLossSnapshot {
   static compute(kalam: KalamType, slices: FundingSlice[]): ProfitLossDTO {

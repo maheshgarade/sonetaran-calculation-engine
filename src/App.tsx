@@ -7,6 +7,7 @@ import type {
   FundingSlice,
 } from "./modules/funding/funding.types";
 import type { KalamType } from "./modules/kalams/kalam.types";
+import { ProfitLossSnapshot } from "./modules/calculation-engine/contexts/kalam/snapshots/profit-loss.snapshot";
 
 function App() {
   useEffect(() => {
@@ -16,11 +17,16 @@ function App() {
     // const itemDetails = mockData.data[0].itemDetails;
     // const fundingDetails = mockData.data[0].fundingDetails;
 
-    const profitLossSnapshot: FundingData =
-      CalculationEngine.calculateProfitLossSnapshot(
-        fundingSlices as FundingSlice[],
-        kalam as KalamType,
-      );
+    // const profitLossSnapshot: FundingData =
+    //   CalculationEngine.calculateProfitLossSnapshot(
+    //     fundingSlices as FundingSlice[],
+    //     kalam as KalamType,
+    //   );
+
+    const profitLossSnapshot: FundingData = ProfitLossSnapshot.compute(
+      kalam as KalamType,
+      fundingSlices as FundingSlice[],
+    );
     console.log("📊 Profit/Loss Snapshot:", profitLossSnapshot);
   }, []);
 
