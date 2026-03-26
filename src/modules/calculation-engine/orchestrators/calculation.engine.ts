@@ -19,12 +19,15 @@ import { calculateMaxLoanTenure2 } from "../rules/tenure.rules";
 import { FunderType } from "../enums/funder-type.enum";
 import type { DurationMode } from "../enums/duration-mode.enum";
 import type { InterestBreakdown } from "../core/interest/interest.types";
-import type { FundingSlice, FundingData } from "../../funding/funding.types";
-import type {
-  SliceStatus,
-  PartnerMetrics,
+import {
   KalamType,
+  PartnerMetrics,
+  SliceStatus,
 } from "../../kalams/kalam.types";
+import {
+  ProfitLossSnapshotProps,
+  FundingSlice,
+} from "@/modules/funding/funding.types";
 
 export class CalculationEngine {
   /**
@@ -359,10 +362,10 @@ export class CalculationEngine {
   static calculateProfitLossSnapshot(
     fundingSlices: FundingSlice[],
     kalam: KalamType,
-  ): FundingData {
+  ): ProfitLossSnapshotProps {
     const now = new Date();
     const customerAnnualInterestRate = (kalam.interest?.rate || 0) * 12 || 0;
-    const profitLossSnapshot: FundingData = {
+    const profitLossSnapshot: ProfitLossSnapshotProps = {
       fundingDue: {
         customer: undefined,
         vyapari: undefined,

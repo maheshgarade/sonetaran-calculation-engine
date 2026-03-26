@@ -1,6 +1,12 @@
-import { FunderType } from "@/modules/calculation-engine/enums/funder-type.enum";
 import { DurationResult } from "@/modules/calculation-engine/core/duration/duration.types";
 import { InterestBreakdown } from "@/modules/calculation-engine/core/interest/interest.types";
+
+export interface FundingDueDTO {
+  customer?: FundingEntityDTO;
+  vyapari?: FundingEntityDTO;
+  dukandar?: FundingEntityDTO;
+  overBorrowed?: FundingEntityDTO;
+}
 
 export interface FundingEntityDTO {
   principal: number;
@@ -17,7 +23,7 @@ export interface FundingEntityDTO {
 }
 
 export interface ProfitLossDTO {
-  fundingDue: Partial<Record<FunderType, FundingEntityDTO>>;
+  fundingDue: FundingDueDTO;
 
   totalFundingDue: number;
 

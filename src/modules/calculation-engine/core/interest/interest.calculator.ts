@@ -1,3 +1,7 @@
+import {
+  CompoundFrequency,
+  InterestType,
+} from "../../enums/interest-type.enum";
 import { InterestUnit, type PeriodicInterest } from "./interest.types";
 
 // What you hand to the user — the final maturity value
@@ -9,8 +13,11 @@ export const calculateTotalAmount = (
   interestType: string,
   compoundFrequency: string,
 ) => {
-  if (interestType.toUpperCase() === "COMPOUND") {
-    if (compoundFrequency.toUpperCase() === "ANNUALLY") {
+  const type = interestType?.toUpperCase() ?? "";
+  const frequency = compoundFrequency?.toUpperCase() ?? "";
+
+  if (type === InterestType.COMPOUND) {
+    if (frequency === CompoundFrequency.ANNUALLY) {
       return calculateAnnualCompoundInterest(
         principal,
         annualRate,
@@ -18,7 +25,7 @@ export const calculateTotalAmount = (
         totalDays,
       );
     }
-  } else if (interestType.toUpperCase() === "SIMPLE") {
+  } else if (type === InterestType.SIMPLE) {
     return calculateSimpleInterest(
       principal,
       annualRate,
@@ -26,6 +33,8 @@ export const calculateTotalAmount = (
       totalDays,
     );
   }
+
+  return 0;
 };
 
 export const calculateAnnualCompoundInterest = (
@@ -108,7 +117,10 @@ export const calculateMonthlyInterest = (
   interestType: string,
   compoundFrequency: string,
 ): PeriodicInterest[] => {
-  if (interestType.toUpperCase() === "SIMPLE") {
+  const type = interestType?.toUpperCase() ?? "";
+  const frequency = compoundFrequency?.toUpperCase() ?? "";
+
+  if (type === InterestType.SIMPLE) {
     return calculateSimpleInterestMonthly(
       principal,
       annualRate,
@@ -117,8 +129,8 @@ export const calculateMonthlyInterest = (
     );
   }
 
-  if (interestType.toUpperCase() === "COMPOUND") {
-    if (compoundFrequency.toUpperCase() === "ANNUALLY") {
+  if (type === InterestType.COMPOUND) {
+    if (frequency === CompoundFrequency.ANNUALLY) {
       return calculateAnnualCompoundInterestMonthly(
         principal,
         annualRate,
@@ -219,8 +231,11 @@ export const interestBreakdown = (
   interestType: string,
   compoundFrequency: string,
 ) => {
-  if (interestType.toUpperCase() === "COMPOUND") {
-    if (compoundFrequency.toUpperCase() === "ANNUALLY") {
+  const type = interestType?.toUpperCase() ?? "";
+  const frequency = compoundFrequency?.toUpperCase() ?? "";
+
+  if (type === InterestType.COMPOUND) {
+    if (frequency === CompoundFrequency.ANNUALLY) {
       return annualCompoundInterestBreakdown(
         principal,
         annualRate,
@@ -228,7 +243,7 @@ export const interestBreakdown = (
         totalDays,
       );
     }
-  } else if (interestType.toUpperCase() === "SIMPLE") {
+  } else if (type === InterestType.SIMPLE) {
     return simpleInterestBreakdown(
       principal,
       annualRate,

@@ -1,8 +1,8 @@
 import { Types } from "mongoose";
 import { DurationMode } from "../calculation-engine/enums/duration-mode.enum";
+import { KalamInterest } from "../kalams/kalam.types";
+import { DurationResult } from "../calculation-engine/core/duration/duration.types";
 import { FunderType } from "../calculation-engine/enums/funder-type.enum";
-import type { DurationResult } from "../calculation-engine/core/duration/duration.calculator";
-import type { KalamInterest } from "../kalams/kalam.types";
 
 export interface FundingSlice {
   _id: string | Types.ObjectId;
@@ -26,7 +26,7 @@ export interface FundingSlice {
   updatedAt: Date | string;
 }
 
-export interface FundingData {
+export interface ProfitLossSnapshotProps {
   fundingDue: {
     customer?: FundingEntity;
     vyapari?: FundingEntity;
