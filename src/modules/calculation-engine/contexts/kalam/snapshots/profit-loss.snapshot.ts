@@ -287,7 +287,7 @@ export class ProfitLossSnapshot {
         overBorrowedMonthlyList[overBorrowedMonthlyList.length - 1]?.interest;
 
       const meta = buildFundingMeta({
-        rate: vyapariAnnualInterestRate || 0,
+        rate: profitLossSnapshot.fundingDue?.vyapari?.interest.rate ?? 0,
         type: vyapariInterestType || InterestType.SIMPLE,
         compoundFrequency: vyapariCompoundFrequency,
         extraMonths: vyapariInterest?.extraMonths,
