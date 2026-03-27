@@ -40,10 +40,14 @@ export interface ProfitLossSnapshotProps {
 
 export interface FundingEntity {
   breakdown: FundingBreakdown[];
-  interest: { monthly: number; total: number };
+  interest: KalamInterest;
   principal: number;
   total: number;
   roundedLoanDuration: DurationResult;
+  terms?: {
+    duration?: DurationMode | string;
+    graceDays?: number | null;
+  };
 }
 
 export interface FundingBreakdown {

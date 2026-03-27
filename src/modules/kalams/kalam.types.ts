@@ -8,6 +8,9 @@ export interface KalamInterest {
   rate: number;
   type: InterestType | string;
   compoundFrequency?: string | null;
+  extraMonths: number | null;
+  monthly: number;
+  total: number;
 }
 
 export type SliceStatus = "active" | "closed";

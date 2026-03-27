@@ -11,6 +11,8 @@ import {
   ProfitLossSnapshotProps,
 } from "@/modules/funding/funding.types";
 import { KalamType } from "@/modules/kalams/kalam.types";
+import { calculateOverBorrowedPrincipal } from "../helpers/overborrowed.helper";
+import { buildFundingMeta } from "../helpers/funding-meta.helper";
 
 export class ProfitLossSnapshot {
   static compute(
@@ -75,11 +77,21 @@ export class ProfitLossSnapshot {
 
     const monthlyInterest =
       monthlyInterestList[monthlyInterestList?.length - 1]?.interest;
-    const interest = { total: totalInterest, monthly: monthlyInterest };
+
+    const meta = buildFundingMeta({
+      rate: kalam.interest?.rate || 0,
+      type: kalam.interest?.type || InterestType.SIMPLE,
+      compoundFrequency: kalam.interest?.compoundFrequency,
+      extraMonths: null,
+      duration: kalam.durationType,
+      graceDays: kalam.gracePeriod,
+      monthly: monthlyInterest,
+      total: totalInterest,
+    });
 
     profitLossSnapshot.fundingDue.customer = {
       breakdown,
-      interest,
+      ...meta,
       principal: kalam.customerPrincipal,
       total,
       roundedLoanDuration,
@@ -133,11 +145,21 @@ export class ProfitLossSnapshot {
         );
         const monthlyInterest =
           monthlyInterestList[monthlyInterestList?.length - 1]?.interest;
-        const interest = { total: totalInterest, monthly: monthlyInterest };
+
+        const meta = buildFundingMeta({
+          rate: slice.interest?.rate || 0,
+          type: slice.interest?.type,
+          compoundFrequency: slice.interest?.compoundFrequency,
+          extraMonths: null,
+          duration: slice.terms.duration,
+          graceDays: slice.terms.graceDays,
+          monthly: monthlyInterest,
+          total: totalInterest,
+        });
 
         profitLossSnapshot.fundingDue.vyapari = {
           breakdown,
-          interest,
+          ...meta,
           principal: slice.fundingPrincipal,
           total,
           roundedLoanDuration,
@@ -189,25 +211,111 @@ export class ProfitLossSnapshot {
 
         const monthlyInterest =
           monthlyInterestList[monthlyInterestList?.length - 1]?.interest;
-        const interest = { total: totalInterest, monthly: monthlyInterest };
+
+        const meta = buildFundingMeta({
+          rate: slice.interest?.rate || 0,
+          type: slice.interest?.type,
+          compoundFrequency: slice.interest?.compoundFrequency,
+          extraMonths: null,
+          duration: slice.interest.type,
+          graceDays: slice.terms.graceDays,
+          monthly: monthlyInterest,
+          total: totalInterest,
+        });
 
         profitLossSnapshot.fundingDue.dukandar = {
           breakdown,
-          interest,
+          ...meta,
           principal: slice.fundingPrincipal,
           total,
           roundedLoanDuration,
         };
       }
     });
+
+    const overBorrowedPrincipal = calculateOverBorrowedPrincipal(
+      fundingSlices,
+      kalam.customerPrincipal,
+    );
+
+    const vyapariAnnualInterestRate =
+      (profitLossSnapshot.fundingDue?.vyapari?.interest.rate ?? 0) * 12 || 0;
+    const vyapariInterestType =
+      profitLossSnapshot.fundingDue?.vyapari?.interest.type;
+    const vyapariCompoundFrequency =
+      profitLossSnapshot.fundingDue?.vyapari?.interest.compoundFrequency;
+    const vyapariTerms = profitLossSnapshot.fundingDue.vyapari?.terms;
+    const vyapariInterest = profitLossSnapshot.fundingDue.vyapari?.interest;
+
+    if (overBorrowedPrincipal > 0) {
+      const overBorrowedTotal =
+        CalculationEngine.calculateTotalAmount(
+          overBorrowedPrincipal,
+          vyapariAnnualInterestRate,
+          roundedLoanDuration.totalMonths,
+          roundedLoanDuration.days,
+          vyapariInterestType || InterestType.SIMPLE,
+          vyapariCompoundFrequency || CompoundFrequency.ANNUALLY,
+        ) || 0;
+
+      const overBorrowedBreakdown =
+        CalculationEngine.interestBreakdown(
+          overBorrowedPrincipal,
+          vyapariAnnualInterestRate,
+          roundedLoanDuration.totalMonths,
+          roundedLoanDuration.days,
+          vyapariInterestType || InterestType.SIMPLE,
+          vyapariCompoundFrequency || CompoundFrequency.ANNUALLY,
+        ) || [];
+
+      const overBorrowedTotalInterest = overBorrowedBreakdown.reduce(
+        (acc, curr) => acc + (curr.interest || 0),
+        0,
+      );
+
+      const overBorrowedMonthlyList =
+        CalculationEngine.calculateMonthlyInterest(
+          overBorrowedPrincipal,
+          vyapariAnnualInterestRate,
+          roundedLoanDuration.totalMonths,
+          roundedLoanDuration.days,
+          vyapariInterestType || InterestType.SIMPLE,
+          vyapariCompoundFrequency || CompoundFrequency.ANNUALLY,
+        );
+
+      const overBorrowedMonthly =
+        overBorrowedMonthlyList[overBorrowedMonthlyList.length - 1]?.interest;
+
+      const meta = buildFundingMeta({
+        rate: vyapariAnnualInterestRate || 0,
+        type: vyapariInterestType || InterestType.SIMPLE,
+        compoundFrequency: vyapariCompoundFrequency,
+        extraMonths: vyapariInterest?.extraMonths,
+        duration: vyapariTerms?.duration || "",
+        graceDays: vyapariTerms?.graceDays,
+        monthly: overBorrowedMonthly,
+        total: overBorrowedTotalInterest,
+      });
+
+      profitLossSnapshot.fundingDue.overBorrowed = {
+        breakdown: overBorrowedBreakdown,
+        ...meta,
+        principal: overBorrowedPrincipal,
+        total: overBorrowedTotal,
+        roundedLoanDuration,
+      };
+    } else {
+      profitLossSnapshot.fundingDue.overBorrowed = undefined;
+    }
+
     profitLossSnapshot.monthlyProfit =
-      profitLossSnapshot.fundingDue.customer.interest.monthly -
-      ((profitLossSnapshot.fundingDue.vyapari?.interest.monthly || 0) +
-        (profitLossSnapshot.fundingDue.overBorrowed?.interest.monthly || 0));
+      (profitLossSnapshot.fundingDue?.customer?.interest?.monthly ?? 0) -
+      ((profitLossSnapshot.fundingDue.vyapari?.interest?.monthly ?? 0) +
+        (profitLossSnapshot.fundingDue.overBorrowed?.interest?.monthly ?? 0));
 
     profitLossSnapshot.totalProfit =
-      profitLossSnapshot.fundingDue.customer.interest.total -
-      ((profitLossSnapshot.fundingDue.vyapari?.interest.total || 0) +
+      (profitLossSnapshot.fundingDue.customer.interest.total ?? 0) -
+      ((profitLossSnapshot.fundingDue.vyapari?.interest.total ?? 0) +
         (profitLossSnapshot.fundingDue.overBorrowed?.interest.total || 0));
 
     profitLossSnapshot.totalFundingDue =
