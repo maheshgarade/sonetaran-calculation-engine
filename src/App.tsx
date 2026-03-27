@@ -24,8 +24,8 @@ function App() {
     //   );
 
     const profitLossSnapshot: FundingData = ProfitLossSnapshot.compute(
-      kalam as KalamType,
       fundingSlices as FundingSlice[],
+      kalam as KalamType,
     );
     console.log("📊 Profit/Loss Snapshot:", profitLossSnapshot);
   }, []);
