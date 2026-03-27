@@ -78,7 +78,7 @@ export class ProfitLossSnapshot {
     const monthlyInterest =
       monthlyInterestList[monthlyInterestList?.length - 1]?.interest;
 
-    const meta = buildFundingMeta({
+    const interest = buildFundingMeta({
       rate: kalam.interest?.rate || 0,
       type: kalam.interest?.type || InterestType.SIMPLE,
       compoundFrequency: kalam.interest?.compoundFrequency,
@@ -91,7 +91,7 @@ export class ProfitLossSnapshot {
 
     profitLossSnapshot.fundingDue.customer = {
       breakdown,
-      ...meta,
+      ...interest,
       principal: kalam.customerPrincipal,
       total,
       roundedLoanDuration,
@@ -146,20 +146,20 @@ export class ProfitLossSnapshot {
         const monthlyInterest =
           monthlyInterestList[monthlyInterestList?.length - 1]?.interest;
 
-        const meta = buildFundingMeta({
+        const interest = buildFundingMeta({
           rate: slice.interest?.rate || 0,
           type: slice.interest?.type,
           compoundFrequency: slice.interest?.compoundFrequency,
           extraMonths: null,
-          duration: slice.terms.duration,
-          graceDays: slice.terms.graceDays,
+          duration: slice.terms?.duration,
+          graceDays: slice.terms?.graceDays,
           monthly: monthlyInterest,
           total: totalInterest,
         });
 
         profitLossSnapshot.fundingDue.vyapari = {
           breakdown,
-          ...meta,
+          ...interest,
           principal: slice.fundingPrincipal,
           total,
           roundedLoanDuration,
@@ -212,20 +212,20 @@ export class ProfitLossSnapshot {
         const monthlyInterest =
           monthlyInterestList[monthlyInterestList?.length - 1]?.interest;
 
-        const meta = buildFundingMeta({
+        const interest = buildFundingMeta({
           rate: slice.interest?.rate || 0,
           type: slice.interest?.type,
           compoundFrequency: slice.interest?.compoundFrequency,
           extraMonths: null,
-          duration: slice.interest.type,
-          graceDays: slice.terms.graceDays,
+          duration: slice.interest?.type,
+          graceDays: slice.terms?.graceDays,
           monthly: monthlyInterest,
           total: totalInterest,
         });
 
         profitLossSnapshot.fundingDue.dukandar = {
           breakdown,
-          ...meta,
+          ...interest,
           principal: slice.fundingPrincipal,
           total,
           roundedLoanDuration,
@@ -286,7 +286,7 @@ export class ProfitLossSnapshot {
       const overBorrowedMonthly =
         overBorrowedMonthlyList[overBorrowedMonthlyList.length - 1]?.interest;
 
-      const meta = buildFundingMeta({
+      const interest = buildFundingMeta({
         rate: profitLossSnapshot.fundingDue?.vyapari?.interest.rate ?? 0,
         type: vyapariInterestType || InterestType.SIMPLE,
         compoundFrequency: vyapariCompoundFrequency,
@@ -299,7 +299,7 @@ export class ProfitLossSnapshot {
 
       profitLossSnapshot.fundingDue.overBorrowed = {
         breakdown: overBorrowedBreakdown,
-        ...meta,
+        ...interest,
         principal: overBorrowedPrincipal,
         total: overBorrowedTotal,
         roundedLoanDuration,
