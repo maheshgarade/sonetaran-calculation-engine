@@ -310,17 +310,17 @@ export class ProfitLossSnapshot {
 
     profitLossSnapshot.monthlyProfit =
       (profitLossSnapshot.fundingDue?.customer?.interest?.monthly ?? 0) -
-      ((profitLossSnapshot.fundingDue.vyapari?.interest?.monthly ?? 0) +
-        (profitLossSnapshot.fundingDue.overBorrowed?.interest?.monthly ?? 0));
+      ((profitLossSnapshot.fundingDue.dukandar?.interest.monthly ?? 0) +
+        (profitLossSnapshot.fundingDue.vyapari?.interest.monthly ?? 0));
 
     profitLossSnapshot.totalProfit =
-      (profitLossSnapshot.fundingDue.customer.interest.total ?? 0) -
-      ((profitLossSnapshot.fundingDue.vyapari?.interest.total ?? 0) +
-        (profitLossSnapshot.fundingDue.overBorrowed?.interest.total || 0));
+      (profitLossSnapshot.fundingDue.customer.total ?? 0) -
+      ((profitLossSnapshot.fundingDue.vyapari?.total ?? 0) +
+        (profitLossSnapshot.fundingDue.dukandar?.total ?? 0));
 
     profitLossSnapshot.totalFundingDue =
-      (profitLossSnapshot.fundingDue.dukandar?.total || 0) +
-      (profitLossSnapshot.fundingDue.overBorrowed?.total || 0);
+      (profitLossSnapshot.fundingDue.dukandar?.total ?? 0) +
+      (profitLossSnapshot.fundingDue.vyapari?.total ?? 0);
 
     return profitLossSnapshot;
   }
