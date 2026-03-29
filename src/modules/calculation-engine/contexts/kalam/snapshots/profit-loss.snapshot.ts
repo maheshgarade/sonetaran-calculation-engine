@@ -308,19 +308,27 @@ export class ProfitLossSnapshot {
       profitLossSnapshot.fundingDue.overBorrowed = undefined;
     }
 
-    profitLossSnapshot.monthlyProfit =
-      (profitLossSnapshot.fundingDue?.customer?.interest?.monthly ?? 0) -
-      ((profitLossSnapshot.fundingDue.dukandar?.interest.monthly ?? 0) +
-        (profitLossSnapshot.fundingDue.vyapari?.interest.monthly ?? 0));
+    const customer = profitLossSnapshot.fundingDue?.customer;
+    const vyapari = profitLossSnapshot.fundingDue?.vyapari;
+    const dukandar = profitLossSnapshot.fundingDue?.dukandar;
 
-    profitLossSnapshot.totalProfit =
-      (profitLossSnapshot.fundingDue.customer.total ?? 0) -
-      ((profitLossSnapshot.fundingDue.vyapari?.total ?? 0) +
-        (profitLossSnapshot.fundingDue.dukandar?.total ?? 0));
+    const hasVyapari = !!vyapari;
 
-    profitLossSnapshot.totalFundingDue =
-      (profitLossSnapshot.fundingDue.dukandar?.total ?? 0) +
-      (profitLossSnapshot.fundingDue.vyapari?.total ?? 0);
+    // Monthly Profit (UNCHANGED)
+    profitLossSnapshot.monthlyProfit = hasVyapari
+      ? (customer?.interest?.monthly ?? 0) - (vyapari?.interest?.monthly ?? 0)
+      : (customer?.interest?.monthly ?? 0);
+
+    // Total Funding Due (UNCHANGED)
+    profitLossSnapshot.totalFundingDue = hasVyapari
+      ? (vyapari?.total ?? 0)
+      : (customer?.total ?? 0);
+
+    // Total Profit (UPDATED AS PER NEW RULE)
+    profitLossSnapshot.totalProfit = hasVyapari
+      ? (customer?.total ?? 0) -
+        ((vyapari?.total ?? 0) + (dukandar?.principal ?? 0))
+      : (customer?.total ?? 0) - (customer?.principal ?? 0);
 
     return profitLossSnapshot;
   }

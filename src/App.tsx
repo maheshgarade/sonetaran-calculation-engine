@@ -9,8 +9,8 @@ import { FundingData } from "./modules/kalams/kalam-snapshot.model";
 function App() {
   useEffect(() => {
     // Example: take the first Kalam entry
-    const kalam = mockData.data[3].kalam;
-    const fundingSlices = mockData.data[3].fundingDetails;
+    const kalam = mockData.data[1].kalam;
+    const fundingSlices = mockData.data[1].fundingDetails;
     // const itemDetails = mockData.data[0].itemDetails;
 
     const profitLossSnapshot: FundingData = ProfitLossSnapshot.compute(
